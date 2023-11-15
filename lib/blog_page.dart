@@ -108,11 +108,6 @@ class _BlogPageState extends State<BlogPage> {
                   ),
                 );
               }),
-            if (blogProv.listElement == null)
-              Center(
-                heightFactor: MediaQuery.of(context).size.height * 0.025,
-                child: const CircularProgressIndicator(),
-              ),
           ],
         ),
       ),

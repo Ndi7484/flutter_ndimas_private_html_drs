@@ -5,7 +5,6 @@ import 'package:flutter_application_blog_html/http_helper.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 // import 'package:translator/translator.dart';
 
 class BlogProvider extends ChangeNotifier {
@@ -35,7 +34,6 @@ class BlogProvider extends ChangeNotifier {
   void htmlFormater() async {
     final document = parse(htmlRaw);
     final divs = document.querySelectorAll('dl');
-    // final divs = document.querySelectorAll('dl').sublist(10, 100);
     listElement = divs;
   }
 
@@ -86,13 +84,14 @@ class BlogProvider extends ChangeNotifier {
 
   String? contentParser(String htmlContent) {
     var document = parse(htmlContent);
-
+    
     List<dom.Node> listElement = [];
 
     var detailElement = document.querySelector('.cl_news_detail');
 
     if (detailElement != null) {
       for (var node in detailElement.children) {
+        print(node);
         listElement.add(node);
       }
     }
@@ -118,20 +117,17 @@ class BlogProvider extends ChangeNotifier {
             .allMatches(el)
             .map((match) => match.group(0))
             .toList();
+        print(elements);
         List<InlineSpan> listTextSpan = [];
         for (int i = 0; i < elements.length; i++) {
           if (elements[i]!.contains('href')) {
             listTextSpan.add(TextSpan(
               recognizer: TapGestureRecognizer()
-                ..onTap = () async {
+                ..onTap = () {
                   final String? match = RegExp(r'\"([^"]+)\"')
                       .stringMatch(elements[i - 2]!)
                       ?.replaceAll('"', '');
-                  if (await canLaunchUrlString(match!)) {
-                    await launchUrlString(match);
-                  } else {
-                    print('cant launch');
-                  }
+                  print(match);
                 },
               text: tr(elements[i + 1]!),
               style: const TextStyle(
@@ -189,6 +185,7 @@ class BlogProvider extends ChangeNotifier {
     for (var el in detailElement) {
       if (el.className == 'news_img_main') {
         print('news_img_main');
+        // _listWidget.add(Text('news img \n ${el.innerHtml}'));
         _listWidget.add(Padding(
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
           child: Image.network(
@@ -196,6 +193,7 @@ class BlogProvider extends ChangeNotifier {
         ));
       } else if (el.className == 'news_title_sub') {
         print('news_title_sub');
+        // _listWidget.add(Text('news title \n ${el.innerHtml}'));
         _listWidget.add(
           Container(
             padding: const EdgeInsets.fromLTRB(8, 2, 8, 2),
@@ -225,8 +223,7 @@ class BlogProvider extends ChangeNotifier {
         var _queryTextChild = news2clmParse.querySelector('.text')?.children;
 
         // Split the input string using regular expressions to extract HTML elements
-        List<String> elements =
-            (_queryTextHtml ?? '').split(RegExp(r'(<[^>]*>.*?)'));
+        List<String> elements = (_queryTextHtml ?? '').split(RegExp(r'(<[^>]*>.*?)'));
 
         // Remove empty or whitespace elements
         elements.removeWhere((element) => element.trim().isEmpty);
